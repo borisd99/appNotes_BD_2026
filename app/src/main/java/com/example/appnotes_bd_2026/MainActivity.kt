@@ -7,19 +7,16 @@ import androidx.room.Room
 
 class MainActivity : AppCompatActivity() {
 
-    // Дефинираме базата тук, за да е достъпна навсякъде
     private lateinit var database: AppDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // 1. Връзваме компонентите от дизайна
         val myListView = findViewById<ListView>(R.id.listView)
         val btnAdd = findViewById<Button>(R.id.button)
         val inputField = findViewById<EditText>(R.id.editTextNote)
 
-        // 2. Инициализираме базата с ново име, за да избегнем стари конфликти
         database = Room.databaseBuilder(
             applicationContext,
             AppDatabase::class.java, "notes_final_db"
@@ -27,7 +24,7 @@ class MainActivity : AppCompatActivity() {
             .fallbackToDestructiveMigration()
             .build()
 
-        // 3. Функция за презареждане на списъка
+        // Функция за презареждане на списъка
         fun updateList() {
             val notesFromDb = database.noteDao().getAllNotes()
             val justTexts = notesFromDb.map { it.text }
@@ -36,18 +33,17 @@ class MainActivity : AppCompatActivity() {
             myListView.adapter = adapter
         }
 
-        // Зареждаме бележките още при стартиране
+        // Зареждане на бележките
         updateList()
 
-        // 4. Логика при натискане на бутона
+        // Бутон
         btnAdd.setOnClickListener {
             val userText = inputField.text.toString().trim()
 
             if (userText.isNotEmpty()) {
-                // Записваме в SQLite
+                // Запис в SQLite
                 database.noteDao().insertNote(Note(text = userText))
 
-                // Чистим полето и обновяваме екрана
                 inputField.text.clear()
                 updateList()
 
